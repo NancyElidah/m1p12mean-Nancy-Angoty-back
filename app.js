@@ -28,6 +28,7 @@ const userController = new UtilisateurController();
 
 router.post("/user/create", userController.create_user);
 router.get("/user/findAll", userController.findAll);
+router.post("/user/login", userController.login);
 
 app.use(router);
 

@@ -1,4 +1,7 @@
 const UtilisateurService = require("../service/Utilisateur_service");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const config = require("../config");
 
 class UtilisateurController {
   constructor() {
@@ -8,7 +11,7 @@ class UtilisateurController {
   }
   create_user = async (req, res) => {
     try {
-      console.log(req.body);
+      req.body.password = bcrypt.hashSync(req.body.password, 8);
       const new_user = await this.utilisateurService.create_utilisateur(
         req.body
       );
@@ -32,7 +35,7 @@ class UtilisateurController {
         return res.status(404).json({ message: "Aucun utilisateur trouvé." });
       }
 
-      // 🔍 Afficher les noms des utilisateurs
+      //  Afficher les noms des utilisateurs
       all_user.forEach((user) => {
         console.log(` Utilisateur : ${user.nom} ${user.prenom}`);
       });
@@ -43,6 +46,38 @@ class UtilisateurController {
       res.status(500).json({
         message: "Erreur serveur. Impossible de récupérer les utilisateurs.",
       });
+    }
+  };
+
+  login = async (req, res) => {
+    try {
+      const user = await this.utilisateurService.find_user_by_email(
+        req.body.email
+      );
+      if (!user) return res.status(404).send("No user found.");
+
+      const passwordIsValid = bcrypt.compareSync(
+        req.body.password,
+        user.password
+      );
+      if (!passwordIsValid)
+        return res.status(401).send({ auth: false, token: null });
+
+      const token = jwt.sign({ id: user.id }, config.secret, {
+        expiresIn: 86400, // expires in 24 hours
+      });
+      const username = req.body.email;
+
+      res.status(200).send({
+        auth: true,
+        token: token,
+        user: username,
+        role: user.statut,
+        valid: user.validation_profil,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error on the server.");
     }
   };
 }
