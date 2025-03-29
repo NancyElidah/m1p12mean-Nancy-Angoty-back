@@ -25,7 +25,6 @@ class PieceController {
       res.status(500).send({ error: "Erreur interne du serveur." });
     }
   };
-
   findAll = async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
