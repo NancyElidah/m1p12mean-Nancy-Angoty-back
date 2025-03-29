@@ -23,7 +23,6 @@ class PieceService {
       throw error;
     }
   }
-
   async update_piece(data) {
     try {
       const updatedPiece = await Piece.findByIdAndUpdate(data._id, data, {
@@ -34,11 +33,17 @@ class PieceService {
       throw error;
     }
   }
-
   async delete_piece(id) {
     try {
       const deletedPiece = await Piece.findByIdAndDelete(id);
       return deletedPiece;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async findById(id) {
+    try {
+      return await Piece.findById(id);
     } catch (error) {
       throw error;
     }
