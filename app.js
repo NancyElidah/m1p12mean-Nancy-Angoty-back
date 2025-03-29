@@ -8,6 +8,7 @@ const VoitureController = require("./controller/VoitureController");
 const ProposController = require("./controller/ProposController");
 const PrestationController = require("./controller/PrestationController");
 const PromotionController = require("./controller/PromotionController");
+const TacheController = require("./controller/TacheController");
 
 mongo();
 
@@ -35,6 +36,7 @@ const voitureController = new VoitureController();
 const proposController = new ProposController();
 const prestationController = new PrestationController();
 const promotionController = new PromotionController();
+const tache = new TacheController();
 
 router.post("/user/create", userController.create_user);
 router.get("/user/findAll", userController.findAll);
@@ -47,7 +49,10 @@ router.put("/piece/update", piece.update);
 router.post("/piece/delete", piece.delete);
 
 router.post("/voiture/create", voitureController.createVoiture);
-router.get("/voiture/getByUser/:idUtilisateur", voitureController.getVoituresByUtilisateur);
+router.get(
+  "/voiture/getByUser/:idUtilisateur",
+  voitureController.getVoituresByUtilisateur
+);
 
 router.post("/propos/create", proposController.createPropos);
 router.get("/propos/findAll", proposController.findAll);
@@ -58,6 +63,10 @@ router.put("/prestation/update", prestationController.updatePrix);
 
 router.post("/promotion/create", promotionController.createPromotion);
 router.get("/promotion/findAll", promotionController.findAll);
+
+router.post("/tache", tache.create);
+router.post("/tache/addDetailsRep", tache.addReparation);
+router.post("/tache/addPieceRep", tache.addPiece);
 
 app.use(router);
 
