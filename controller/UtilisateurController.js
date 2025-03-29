@@ -8,6 +8,7 @@ class UtilisateurController {
     this.utilisateurService = new UtilisateurService();
     this.create_user = this.create_user.bind(this);
     this.findAll = this.findAll.bind(this);
+    this.valid = this.valid.bind(this);
   }
   create_user = async (req, res) => {
     try {
@@ -51,6 +52,7 @@ class UtilisateurController {
 
   login = async (req, res) => {
     try {
+      console.log("Headers reçus :", req.headers);
       const user = await this.utilisateurService.find_user_by_email(
         req.body.email
       );
@@ -68,12 +70,29 @@ class UtilisateurController {
       });
       const username = req.body.email;
 
+      const t = req.headers["x-access-token"] || req.headers["authorization"];
+
+      console.log("Token:", t);
       res.status(200).send({
         auth: true,
         token: token,
         user: username,
         role: user.statut,
         valid: user.validation_profil,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error on the server.");
+    }
+  };
+  valid = async (req, res) => {
+    try {
+      console.log(req.body.id);
+      const user = await this.utilisateurService.validation_profil(req.body.id);
+      if (!user) return res.status(404).send("User introuvable");
+      res.status(200).send({
+        user: user,
+        resultat: "Validation réussie",
       });
     } catch (err) {
       console.error(err);
