@@ -67,6 +67,11 @@ router.get("/promotion/findAll", promotionController.findAll);
 router.post("/tache", tache.create);
 router.post("/tache/addDetailsRep", tache.addReparation);
 router.post("/tache/addPieceRep", tache.addPiece);
+router.get("/tache", tache.findAll);
+router.get("/tache/findByDate", tache.findByDates);
+router.get("/tache/findByMec", tache.findByMecanicien);
+router.put("/tache/update", tache.update);
+router.post("/tache/delete", tache.delete_tache);
 
 app.use(router);
 
