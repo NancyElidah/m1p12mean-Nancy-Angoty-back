@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 5000;
 const mongo = require("./config/dbMongo");
 const UtilisateurController = require("./controller/UtilisateurController");
 const PieceController = require("./controller/PieceController");
@@ -72,9 +71,9 @@ router.get("/tache/findByDate", tache.findByDates);
 router.get("/tache/findByMec", tache.findByMecanicien);
 router.put("/tache/update", tache.update);
 router.post("/tache/delete", tache.delete_tache);
-
+app.get('/', (req, res) => {
+  res.send('Bienvenue sur mon API déployée sur Vercel ! 🚀');
+});
 app.use(router);
 
-app.listen(port, () => {
-  console.log(`Serveur démarré sur le port ${port}`);
-});
+module.exports = app;
