@@ -48,6 +48,14 @@ class PieceService {
       throw error;
     }
   }
+  async getAll() {
+    try {
+      const prestation = await Piece.find();
+      return prestation;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = PieceService;
