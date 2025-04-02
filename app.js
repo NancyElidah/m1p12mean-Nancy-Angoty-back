@@ -45,6 +45,7 @@ router.put("/user/validation", userController.valid);
 
 router.post("/piece/create", piece.create_piece);
 router.get("/piece/", piece.findAll);
+router.get("/piece/findAll", piece.getAll);
 router.put("/piece/update", piece.update);
 router.post("/piece/delete", piece.delete);
 
@@ -72,6 +73,14 @@ router.get("/tache/findByDate", tache.findByDates);
 router.get("/tache/findByMec", tache.findByMecanicien);
 router.put("/tache/update", tache.update);
 router.post("/tache/delete", tache.delete_tache);
+router.get("/tache/findAll", tache.getAll);
+router.get("/tache/findAllEnAttente", tache.getAllEnAttente);
+router.put("/tache/update_date", tache.update_date);
+router.get("/tache/fin", tache.getAllFin);
+router.get("/tache/en_cours", tache.getAllEnCours);
+router.get("/tache/filtre_attente", tache.getTacheEnAttenteFiltre);
+router.get("/tache/filtre_encours", tache.getAllEnCoursFiltre);
+router.get("/tache/filtre_fin", tache.getAllFinFiltre);
 
 app.use(router);
 

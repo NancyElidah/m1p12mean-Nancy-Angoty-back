@@ -89,6 +89,170 @@ class TacheService {
       throw error;
     }
   }
+  async getAllTaches() {
+    try {
+      const taches = await Tache.find()
+        .populate("id_voiture")
+        .populate("id_mecanicien")
+        .exec();
+
+      console.log(taches);
+      return taches;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des tâches:", error);
+    }
+  }
+  async getTacheEnAttente() {
+    try {
+      const taches = await Tache.find({ date_reparation: null })
+        .populate("id_voiture")
+        .populate("id_mecanicien")
+        .exec();
+
+      console.log(taches);
+      return taches;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des tâches:", error);
+    }
+  }
+  async updateDate(idTache, date, type_date) {
+    try {
+      if (!["date_reparation", "date_fin"].includes(type_date)) {
+        throw new Error("Type de date invalide !");
+      }
+
+      const tache = await Tache.findByIdAndUpdate(
+        idTache,
+        { [type_date]: date },
+        { new: true }
+      );
+
+      if (!tache) {
+        console.log("Aucune tâche trouvée avec cet ID");
+        return null;
+      }
+
+      console.log("Tâche mise à jour :", tache);
+      return tache;
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour :", error);
+    }
+  }
+  async getTacheFin() {
+    try {
+      const taches = await Tache.find({ date_fin: { $ne: null } })
+        .populate("id_voiture")
+        .populate("id_mecanicien")
+        .exec();
+
+      console.log(taches);
+      return taches;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des tâches:", error);
+    }
+  }
+  async getAllEnCour() {
+    try {
+      const taches = await Tache.find({
+        date_fin: null,
+        date_reparation: { $ne: null },
+      })
+        .populate("id_voiture")
+        .populate("id_mecanicien")
+        .exec();
+
+      console.log(taches);
+      return taches;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des tâches en cours :",
+        error
+      );
+    }
+  }
+  async getTacheEnAttenteFiltre(idMecanicien = null, date_attribution = null) {
+    try {
+      let filtre = { date_fin: null, date_reparation: null };
+
+      if (idMecanicien) {
+        filtre.id_mecanicien = idMecanicien;
+      }
+
+      if (date_attribution) {
+        filtre.date_attribution = date_attribution;
+      }
+
+      const taches = await Tache.find(filtre)
+        .populate("id_voiture")
+        .populate("id_mecanicien")
+        .exec();
+
+      console.log(taches);
+      return taches;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des tâches en attente :",
+        error
+      );
+    }
+  }
+  async getTacheEnCours(idMecanicien = null, date_attribution = null) {
+    try {
+      let filtre = {
+        date_fin: null,
+        date_reparation: { $ne: null },
+      };
+
+      if (idMecanicien) {
+        filtre.id_mecanicien = idMecanicien;
+      }
+
+      if (date_attribution) {
+        filtre.date_attribution = date_attribution;
+      }
+
+      const taches = await Tache.find(filtre)
+        .populate("id_voiture")
+        .populate("id_mecanicien")
+        .exec();
+
+      console.log(taches);
+      return taches;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des tâches en cours :",
+        error
+      );
+    }
+  }
+  async getTacheFinFiltre(idMecanicien = null, date_attribution = null) {
+    try {
+      let filtre = {
+        date_fin: { $ne: null },
+      };
+
+      if (idMecanicien) {
+        filtre.id_mecanicien = idMecanicien;
+      }
+
+      if (date_attribution) {
+        filtre.date_attribution = date_attribution;
+      }
+
+      const taches = await Tache.find(filtre)
+        .populate("id_voiture")
+        .populate("id_mecanicien")
+        .exec();
+
+      console.log(taches);
+      return taches;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des tâches en cours :",
+        error
+      );
+    }
+  }
 }
 
 module.exports = TacheService;

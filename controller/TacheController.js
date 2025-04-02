@@ -186,6 +186,187 @@ class TacheController {
       res.status(500).send({ error: "Erreur interne du serveur." });
     }
   };
+  getAll = async (req, res) => {
+    try {
+      const taches = await this.tache_service.getAllTaches();
+      res.status(200).json(taches);
+    } catch (error) {
+      res.status(500).json({
+        message: "Erreur lors de la récupération des tâches." + error,
+      });
+    }
+  };
+  getAllEnAttente = async (req, res) => {
+    try {
+      await this.tool.verifyToken(req, res, async () => {
+        const user = await this.tool.get_user_online(req);
+        if (user.statut == 0) {
+          const tache = await this.tache_service.getTacheEnAttente();
+          res.status(201).send({ droit: true, tache: tache });
+        } else {
+          res
+            .status(403)
+            .send({ droit: false, message: "Utilisateur non autorisé" });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: "Erreur interne du serveur." });
+    }
+  };
+  update_date = async (req, res) => {
+    try {
+      await this.tool.verifyToken(req, res, async () => {
+        const user = await this.tool.get_user_online(req);
+        console.log("user" + user);
+        if (user.statut == 10) {
+          const { idTache, date, type_date } = req.body;
+
+          if (!["date_reparation", "date_fin"].includes(type_date)) {
+            return res.status(400).send({ error: "Type de date invalide !" });
+          }
+
+          if (!idTache || !date) {
+            return res
+              .status(400)
+              .send({ error: "ID de tâche et date requis !" });
+          }
+
+          const tache = await this.tache_service.updateDate(
+            idTache,
+            date,
+            type_date
+          );
+
+          if (!tache) {
+            return res.status(404).send({ error: "Tâche non trouvée !" });
+          }
+
+          res
+            .status(200)
+            .send({ message: "Tâche mise à jour avec succès", tache });
+        } else {
+          res.status(403).send({ error: "Utilisateur non autorisé" });
+        }
+      });
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la date :", error);
+      res.status(500).send({ error: "Erreur interne du serveur." });
+    }
+  };
+  getAllFin = async (req, res) => {
+    try {
+      await this.tool.verifyToken(req, res, async () => {
+        const user = await this.tool.get_user_online(req);
+        if (user.statut == 0) {
+          const tache = await this.tache_service.getTacheFin();
+          res.status(201).send({ droit: true, tache: tache });
+        } else {
+          res
+            .status(403)
+            .send({ droit: false, message: "Utilisateur non autorisé" });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: "Erreur interne du serveur." });
+    }
+  };
+  getAllEnCours = async (req, res) => {
+    try {
+      await this.tool.verifyToken(req, res, async () => {
+        const user = await this.tool.get_user_online(req);
+        if (user.statut == 0) {
+          const tache = await this.tache_service.getAllEnCour();
+          res.status(201).send({ droit: true, tache: tache });
+        } else {
+          res
+            .status(403)
+            .send({ droit: false, message: "Utilisateur non autorisé" });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: "Erreur interne du serveur." });
+    }
+  };
+  getTacheEnAttenteFiltre = async (req, res) => {
+    try {
+      await this.tool.verifyToken(req, res, async () => {
+        const user = await this.tool.get_user_online(req);
+
+        if (user.statut === 0 || user.statut === 10) {
+          const { idMecanicien, date_attribution } = req.body;
+          const taches = await this.tache_service.getTacheEnAttenteFiltre(
+            idMecanicien,
+            date_attribution
+          );
+          res.status(200).json({ success: true, taches });
+        } else {
+          res
+            .status(403)
+            .json({ success: false, message: "Utilisateur non autorisé" });
+        }
+      });
+    } catch (error) {
+      console.error("Erreur dans getTacheEnAttenteFiltre :", error);
+      res
+        .status(500)
+        .json({ success: false, error: "Erreur interne du serveur." });
+    }
+  };
+  getAllEnCoursFiltre = async (req, res) => {
+    try {
+      await this.tool.verifyToken(req, res, async () => {
+        const user = await this.tool.get_user_online(req);
+
+        if (user.statut === 0 || user.statut === 10) {
+          const { idMecanicien, date_attribution } = req.body;
+          const taches = await this.tache_service.getTacheEnCours(
+            idMecanicien,
+            date_attribution
+          );
+
+          res.status(200).json({ success: true, taches });
+        } else {
+          res
+            .status(403)
+            .json({ success: false, message: "Utilisateur non autorisé" });
+        }
+      });
+    } catch (error) {
+      console.error("Erreur dans getAllEnCours :", error);
+      res
+        .status(500)
+        .json({ success: false, error: "Erreur interne du serveur." });
+    }
+  };
+  getAllFinFiltre = async (req, res) => {
+    try {
+      await this.tool.verifyToken(req, res, async () => {
+        const user = await this.tool.get_user_online(req);
+
+        if (user.statut === 0) {
+          const { idMecanicien, date_attribution } = req.body;
+          const taches = await this.tache_service.getTacheFinFiltre(
+            idMecanicien,
+            date_attribution
+          );
+
+          res.status(200).json({ success: true, taches });
+        } else {
+          res
+            .status(403)
+            .json({ success: false, message: "Utilisateur non autorisé" });
+        }
+      });
+    } catch (error) {
+      console.error("Erreur dans getAllEnCours :", error);
+      res
+        .status(500)
+        .json({ success: false, error: "Erreur interne du serveur." });
+    }
+  };
 }
 
 module.exports = TacheController;

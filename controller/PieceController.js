@@ -6,7 +6,6 @@ class PieceController {
     this.piece_service = new PieceService();
     this.tool = new Tool();
   }
-
   create_piece = async (req, res) => {
     try {
       await this.tool.verifyToken(req, res, async () => {
@@ -102,6 +101,18 @@ class PieceController {
     } catch (error) {
       console.error(error);
       res.status(500).send({ error: "Erreur interne du serveur." });
+    }
+  };
+  getAll = async (req, res) => {
+    try {
+      const liste = await this.piece_service.getAll();
+      if (!liste || liste.length === 0) {
+        console.log("tsy misy");
+        return res.status(404).json({ message: "Aucune piece" });
+      }
+      res.status(200).json(liste);
+    } catch (error) {
+      res.status(500).json({ message: "Erreur, tsy misy prestation" });
     }
   };
 }
