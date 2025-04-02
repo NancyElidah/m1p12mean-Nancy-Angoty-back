@@ -48,6 +48,7 @@ router.get("/piece/findAll", piece.getAll);
 router.put("/piece/update", piece.update);
 router.post("/piece/delete", piece.delete);
 
+
 router.post("/voiture/create", voitureController.createVoiture);
 router.get(
   "/voiture/getByUser/:idUtilisateur",
