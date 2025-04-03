@@ -8,6 +8,8 @@ const ProposController = require("./controller/ProposController");
 const PrestationController = require("./controller/PrestationController");
 const PromotionController = require("./controller/PromotionController");
 const TacheController = require("./controller/TacheController");
+const RendezVousController = require("./controller/RendezVousController");
+
 
 mongo();
 
