@@ -66,6 +66,12 @@ router.delete("/prestation/delete", prestation.delete);
 router.post("/promotion/create", promotion.createPromotion);
 router.get("/promotion/findAll", promotion.findAll);
 
+router.post("/rendezvous/add", rendezvous.addRendezVous);
+router.get("/rendezvous/findAll", rendezvous.findAll);
+router.put("/rendezvous/validate", rendezvous.validate);
+router.put("/rendezvous/update", rendezvous.update);
+
+
 router.post("/tache", tache.create);
 router.post("/tache/addDetailsRep", tache.addReparation);
 
