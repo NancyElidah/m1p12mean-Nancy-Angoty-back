@@ -38,6 +38,8 @@ const propos = new ProposController();
 const prestation = new PrestationController();
 const promotion = new PromotionController();
 const tache = new TacheController();
+const rendezvous = new RendezVousController();
+
 
 router.post("/user/create", userController.create_user);
 router.get("/user/findAll", userController.findAll);
