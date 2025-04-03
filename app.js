@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const port = process.env.PORT || 5000;
 const mongo = require("./config/dbMongo");
 const UtilisateurController = require("./controller/UtilisateurController");
 const PieceController = require("./controller/PieceController");
@@ -31,10 +32,10 @@ app.use((req, res, next) => {
 const router = express.Router();
 const userController = new UtilisateurController();
 const piece = new PieceController();
-const voitureController = new VoitureController();
-const proposController = new ProposController();
-const prestationController = new PrestationController();
-const promotionController = new PromotionController();
+const voiture = new VoitureController();
+const propos = new ProposController();
+const prestation = new PrestationController();
+const promotion = new PromotionController();
 const tache = new TacheController();
 
 router.post("/user/create", userController.create_user);
@@ -44,31 +45,30 @@ router.put("/user/validation", userController.valid);
 
 router.post("/piece/create", piece.create_piece);
 router.get("/piece/", piece.findAll);
-router.get("/piece/findAll", piece.getAll);
 router.put("/piece/update", piece.update);
-router.post("/piece/delete", piece.delete);
+router.delete("/piece/delete", piece.delete);
 
+router.post("/voiture/create", voiture.createVoiture);
+router.get("/voiture/getByUser/:idUtilisateur",voiture.getVoituresByUtilisateur);
+router.get("/voiture/findAll",voiture.findAll);
 
-router.post("/voiture/create", voitureController.createVoiture);
-router.get(
-  "/voiture/getByUser/:idUtilisateur",
-  voitureController.getVoituresByUtilisateur
-);
+router.post("/propos/create", propos.createPropos);
+router.get("/propos/findAll", propos.findAll);
+router.put("/propos/update", propos.update);
+router.delete("/propos/delete", propos.delete);
 
-router.post("/propos/create", proposController.createPropos);
-router.get("/propos/findAll", proposController.findAll);
+router.post("/prestation/create", prestation.createPrestation);
+router.get("/prestation/findAll", prestation.findAll);
+router.get("/prestation/getAll", prestation.getAll);
+router.put("/prestation/update", prestation.update);
+router.delete("/prestation/delete", prestation.delete);
 
-router.post("/prestation/create", prestationController.createPrestation);
-router.get("/prestation/findAll", prestationController.findAll);
-router.put("/prestation/update", prestationController.updatePrix);
-
-router.post("/promotion/create", promotionController.createPromotion);
-router.get("/promotion/findAll", promotionController.findAll);
+router.post("/promotion/create", promotion.createPromotion);
+router.get("/promotion/findAll", promotion.findAll);
 
 router.post("/tache", tache.create);
 router.post("/tache/addDetailsRep", tache.addReparation);
-router.post("/tache/addPieceRep", tache.addPiece);
-router.get("/tache", tache.findAll);
+
 router.get("/tache/findByDate", tache.findByDates);
 router.get("/tache/findByMec", tache.findByMecanicien);
 router.put("/tache/update", tache.update);
@@ -84,7 +84,8 @@ router.get("/tache/en_cours", tache.getAllEnCours);
 router.get("/tache/filtre_attente", tache.getTacheEnAttenteFiltre);
 router.get("/tache/filtre_encours", tache.getAllEnCoursFiltre);
 router.get("/tache/filtre_fin", tache.getAllFinFiltre);
-
 app.use(router);
 
-module.exports = app;
+app.listen(port, () => {
+  console.log(`Serveur démarré sur le port ${port}`);
+});

@@ -18,18 +18,26 @@ class VoitureService {
     }
   }
   
-  async findAll() {
+  async findAll(skip, limit) {
     try {
-      const voitures = await Voiture.find(); 
-      return voitures;
+      return await Voiture.find().skip(skip).limit(limit).populate('idUtilisateur', '_id nom prenom');
     } catch (error) {
       throw error;
     }
   }
-  async getByIdUtilisateur(idUtilisateur) {
+
+  async findById(idUtilisateur, skip, limit) {
     try {
-      const voitures = await Voiture.find({ idUtilisateur }).populate('idUtilisateur');
-      return voitures;
+        const voitures = await Voiture.find({ idUtilisateur }).skip(skip).limit(limit).populate('idUtilisateur');
+        return voitures;
+    } catch (error) {
+        throw error;
+    }
+  }
+
+  async countVoiture() {
+    try {
+      return await Voiture.countDocuments();
     } catch (error) {
       throw error;
     }

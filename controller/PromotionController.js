@@ -1,18 +1,24 @@
 const PromotionService = require("../service/PromotionService");
+const Tool = require("../utile/Tool");
 
 class PromotionController {
   constructor() {
     this.promotionService = new PromotionService();
-    this.createPromotion = this.createPromotion.bind(this);
-    this.findAll = this.findAll.bind(this);
+    this.tool = new Tool();
   }
 
   createPromotion = async (req, res) => {
     try {
-      console.log(req.body);
-      const promotion = await this.promotionService.create(req.body);
-      res.status(201).json(promotion);
-    } catch (error) {
+      await this.tool.verifyToken(req, res, async () => {
+        const user = await this.tool.get_user_online(req);
+        if (user.statut == 0) {
+          const promotion = await this.promotionService.create(req.body);
+          res.status(201).send({ droit: true, promotion: promotion });
+        } else {
+          res.status(403).send({ droit: false, message: "Utilisateur non autorisé." });
+        }
+      });
+    }catch (error) {
       console.log(error);
       res.status(500).send(error);
     }

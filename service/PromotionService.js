@@ -15,13 +15,13 @@ class PromotionService{
             throw error;
         }
     }
-    async findAll() {
-        try {
-          const promotion = await Promotion.find();
-          return promotion;
-        } catch (error) {
-          throw error;
-        }
+
+    async findAll(skip, limit) {
+      try {
+        return await Promotion.find().skip(skip).limit(limit).populate('idPrestation', 'idPrestation intitule');
+      } catch (error) {
+        throw error;
+      }
     }
 }
 module.exports = PromotionService;
