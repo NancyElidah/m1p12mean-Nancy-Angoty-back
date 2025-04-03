@@ -95,9 +95,4 @@ router.get("/tache/filtre_encours", tache.getAllEnCoursFiltre);
 router.get("/tache/filtre_fin", tache.getAllFinFiltre);
 app.use(router);
 
-app.listen(port, () => {
-  console.log(`Serveur démarré sur le port ${port}`);
-});
-
-
 module.exports = app;
