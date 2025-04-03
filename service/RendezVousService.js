@@ -1,4 +1,3 @@
-const Rendez_vous = require("../model/Rendez_vous");
 const RendezVous = require("../model/Rendez_vous");
 
 class RendezVousService {

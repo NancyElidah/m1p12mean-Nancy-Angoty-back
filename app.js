@@ -95,4 +95,5 @@ app.listen(port, () => {
   console.log(`Serveur démarré sur le port ${port}`);
 });
 
+
 module.exports = app;
