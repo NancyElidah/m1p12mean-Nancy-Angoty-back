@@ -82,6 +82,13 @@ router.get("/tache/filtre_attente", tache.getTacheEnAttenteFiltre);
 router.get("/tache/filtre_encours", tache.getAllEnCoursFiltre);
 router.get("/tache/filtre_fin", tache.getAllFinFiltre);
 
+router.get("/voiture/recherche/:query", voitureController.getVoiture);
+router.get(
+  "/user/mecanicien_recherche/:query",
+  userController.getMecanicienController
+);
+router.get("/prestation/recherche/:query", prestationController.getPrestation);
+router.get("/tache/getById/:id", tache.getTacheById);
 app.use(router);
 
 app.listen(port, () => {

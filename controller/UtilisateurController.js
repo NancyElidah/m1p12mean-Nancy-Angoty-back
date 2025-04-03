@@ -99,5 +99,16 @@ class UtilisateurController {
       res.status(500).send("Error on the server.");
     }
   };
+  getMecanicienController = async (req, res) => {
+    try {
+      const { query } = req.params;
+      const mecaniciens = await this.utilisateurService.getMecanicien(query);
+      return res.status(200).json(mecaniciens);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Erreur interne du serveur : " + error });
+    }
+  };
 }
 module.exports = UtilisateurController;

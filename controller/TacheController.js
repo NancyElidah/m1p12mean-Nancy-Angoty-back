@@ -14,6 +14,64 @@ class TacheController {
     try {
       await this.tool.verifyToken(req, res, async () => {
         const user = await this.tool.get_user_online(req);
+
+        console.log(
+          "details_rep dans le corps de la requête :",
+          req.body.details_rep
+        );
+
+        // Vérification si details_rep est null
+        if (req.body.details_rep === null) {
+          console.log("details_rep est null");
+          return res
+            .status(400)
+            .send({ error: "details_rep ne peut pas être null." });
+        } else if (Array.isArray(req.body.details_rep)) {
+          if (req.body.details_rep.length === 0) {
+            console.log("details_rep est un tableau vide");
+            req.body.prix_total = 0;
+          } else {
+            let totalPrix = 0;
+            // Traitement du tableau details_rep
+            await Promise.all(
+              req.body.details_rep.map(async (item) => {
+                try {
+                  const prestation = await this.prestation.findById(
+                    item.prestation
+                  );
+                  if (prestation) {
+                    item.prix = prestation.prix;
+                    item.prix_total = prestation.prix * item.quantite;
+                    totalPrix += item.prix_total;
+                  } else {
+                    console.log(
+                      `Prestation avec l'ID ${item.prestation} non trouvée.`
+                    );
+                  }
+                } catch (err) {
+                  console.error(
+                    `Erreur lors de la récupération de la prestation : ${err.message}`
+                  );
+                }
+              })
+            );
+
+            if (totalPrix === 0) {
+              return res
+                .status(400)
+                .send({ error: "Erreur: Aucun prix total calculé." });
+            }
+
+            console.log("Somme totale des prix_total : ", totalPrix);
+            req.body.prix_total = totalPrix;
+          }
+        } else {
+          console.log("details_rep n'est pas un tableau ou est manquant.");
+          return res
+            .status(400)
+            .send({ error: "details_rep est manquant ou mal formé." });
+        }
+
         if (user.statut == 0) {
           const tache = await this.tache_service.createTache(req.body);
           res.status(201).send({ droit: true, tache: tache });
@@ -365,6 +423,18 @@ class TacheController {
       res
         .status(500)
         .json({ success: false, error: "Erreur interne du serveur." });
+    }
+  };
+  getTacheById = async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const tache = await this.tache_service.getTacheById(id);
+
+      return res.status(200).json({ tache });
+    } catch (error) {
+      console.error("Erreur dans le contrôleur :", error.message);
+      return res.status(404).json({ success: false, error: error.message });
     }
   };
 }

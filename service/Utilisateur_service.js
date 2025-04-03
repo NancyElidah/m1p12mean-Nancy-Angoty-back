@@ -78,6 +78,21 @@ class UtilisateurService {
       throw err;
     }
   }
+  async getMecanicien(query) {
+    try {
+      const mecaniciens = await Utilisateur.find({
+        statut: 10,
+        $or: [
+          { nom: { $regex: query, $options: "i" } },
+          { prenom: { $regex: query, $options: "i" } },
+        ],
+      });
+
+      return mecaniciens;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = UtilisateurService;

@@ -17,10 +17,10 @@ class VoitureService {
       throw error;
     }
   }
-  
+
   async findAll() {
     try {
-      const voitures = await Voiture.find(); 
+      const voitures = await Voiture.find();
       return voitures;
     } catch (error) {
       throw error;
@@ -28,13 +28,24 @@ class VoitureService {
   }
   async getByIdUtilisateur(idUtilisateur) {
     try {
-      const voitures = await Voiture.find({ idUtilisateur }).populate('idUtilisateur');
+      const voitures = await Voiture.find({ idUtilisateur }).populate(
+        "idUtilisateur"
+      );
       return voitures;
     } catch (error) {
       throw error;
     }
   }
-  
+  async getVoiture(query) {
+    try {
+      const voitures = await Voiture.find({
+        immatriculation: { $regex: query, $options: "i" },
+      });
+      return voitures;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = VoitureService;

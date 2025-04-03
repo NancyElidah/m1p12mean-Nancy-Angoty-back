@@ -253,6 +253,44 @@ class TacheService {
       );
     }
   }
+  async getTacheById(id) {
+    try {
+      if (!id) {
+        throw new Error("L'ID de la tâche est requis.");
+      }
+
+      const tache = await Tache.findById(id)
+        .populate("id_voiture")
+        .populate("id_mecanicien")
+        .populate({
+          path: "details_rep",
+          populate: [
+            {
+              path: "prestation",
+              model: "Prestation",
+            },
+            {
+              path: "details_pieces",
+              populate: {
+                path: "id_piece",
+                model: "piece",
+              },
+            },
+          ],
+        });
+
+      if (!tache) {
+        throw new Error(`Tâche avec l'ID ${id} non trouvée.`);
+      }
+
+      return tache;
+    } catch (err) {
+      console.error(
+        `Erreur lors de la récupération de la tâche: ${err.message}`
+      );
+      throw err;
+    }
+  }
 }
 
 module.exports = TacheService;

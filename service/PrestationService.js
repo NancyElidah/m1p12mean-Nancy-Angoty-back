@@ -46,5 +46,15 @@ class PrestationService {
       throw error;
     }
   }
+  async getPrestation(query) {
+    try {
+      const prestations = await Prestation.find({
+        intitule: { $regex: query, $options: "i" },
+      });
+      return prestations;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 module.exports = PrestationService;

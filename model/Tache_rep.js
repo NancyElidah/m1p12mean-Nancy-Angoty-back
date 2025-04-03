@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const detailPieceSchema = new mongoose.Schema(
   {
-    id_piece: { type: String, required: true },
+    id_piece: { type: String, ref: "piece", required: true },
     quantite: { type: Number, required: true },
     prix: { type: Number, required: true },
     prix_total: { type: Number, required: false },
