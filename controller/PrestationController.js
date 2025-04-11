@@ -1,62 +1,95 @@
 const PrestationService = require("../service/PrestationService");
+const Tool = require("../utile/Tool");
 
 class PrestationController {
   constructor() {
     this.prestationService = new PrestationService();
-    this.createPrestation = this.createPrestation.bind(this);
-    this.findAll = this.findAll.bind(this);
-    this.updatePrix = this.updatePrix.bind(this);
+    this.tool = new Tool();
   }
+
   createPrestation = async (req, res) => {
     try {
-      console.log(req.body);
-      const prestation = await this.prestationService.create(req.body);
-      res.status(201).json(prestation);
+      // await this.tool.verifyToken(req, res, async () => {
+      //   const user = await this.tool.get_user_online(req);
+      //   if (user.statut == 0) {
+          const prestation = await this.prestationService.create(req.body);
+          res.status(201).send({ prestation: prestation });
+      //   } else {
+      //     res.status(403).send({ droit: false, message: "Utilisateur non autorisé." });
+      //   }
+      // });
     } catch (error) {
       console.log(error);
       res.status(500).send(error);
     }
   };
+
+  getAll = async (req, res) => {
+    try {
+      const prestation = await this.prestationService.findAll();
+      res.status(200).json({prestation: prestation});
+    } catch (error) {
+      console.error("Error fetching prestations:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des prestations." });
+    }
+  };
+  
   findAll = async (req, res) => {
     try {
-      const liste = await this.prestationService.findAll();
-      if (!liste || liste.length === 0) {
-        console.log("tsy misy");
-        return res.status(404).json({ message: "Aucune prestation." });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      if (page < 1 || limit < 1) {
+        return res.status(400).json({message: "Les paramètres de pagination doivent être supérieurs à 0.",});
       }
-      res.status(200).json(liste);
+      const skip = (page - 1) * limit;
+      const prestation = await this.prestationService.findAll(skip, limit);
+      const totalPrestation = await this.prestationService.countPrestation();
+      const totalPages = Math.ceil(totalPrestation / limit);
+      res.status(200).json({prestation: prestation, totalPrestation: totalPrestation, totalPages: totalPages, currentPage: page});
     } catch (error) {
-      res.status(500).json({ message: "Erreur, tsy misy prestation" });
+      console.error("Error fetching prestations:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des prestations." });
     }
   };
-  updatePrix = async (req, res) => {
+
+  update = async (req, res) => {
     try {
-      const data = req.body;
-      const nouvellePrestation = await this.prestationService.update(data);
-      res.status(200).json(nouvellePrestation);
+      await this.tool.verifyToken(req, res, async () => {
+        const user = await this.tool.get_user_online(req);
+        if (user.statut == 0) {
+          const prestation = await this.prestationService.update(req.body);
+          res.status(201).send({ droit: true, prestation: prestation });
+        } else {
+          res.status(403).send({ droit: false, message: "Utilisateur non autorisé." });
+        }
+      });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.error(error);
+      res.status(500).send({ error: "Erreur interne du serveur." });
     }
   };
-  getPrestation = async (req, res) => {
+
+  delete = async (req, res) => {
     try {
-      const { query } = req.params;
-
-      if (!query) {
-        return res
-          .status(400)
-          .json({ message: "Taper un mot pour avoir le résultat." });
-      }
-      console.log("query : " + query);
-      const prestations = await this.prestationService.getPrestation(query);
-
-      return res.status(200).json(prestations);
+      // await this.tool.verifyToken(req, res, async () => {
+      //   const user = await this.tool.get_user_online(req);
+      //   if (user.statut == 0) {
+          const { id } = req.body;
+          if (!id) {
+            return res.status(400).send({ error: "ID requis" });
+          }
+          const prestation = await this.prestationService.delete(id);
+          if (!prestation) {
+            return res.status(404).send({ error: "Prestation non trouvée." });
+          }
+          res.status(200).send({ message: "Prestation supprimée." });
+      //   } else {
+      //     res.status(403).send({ droit: false, message: "Utilisateur non autorisé." });
+      //   }
+      // });
     } catch (error) {
-      console.error("Erreur lors de la récupération des prestations :", error);
-      console.log("erreur : " + error);
-      return res
-        .status(500)
-        .json({ message: "Erreur interne du serveur." + error });
+      console.error(error);
+      res.status(500).send({ error: "Erreur interne du serveur." });
     }
   };
 }

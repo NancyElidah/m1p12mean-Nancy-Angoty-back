@@ -17,35 +17,32 @@ class VoitureService {
       throw error;
     }
   }
+  
+  async findAll(skip, limit) {
+    try {
+      return await Voiture.find().skip(skip).limit(limit).populate('idUtilisateur', '_id nom prenom');
+    } catch (error) {
+      throw error;
+    }
+  }
 
-  async findAll() {
+  async findById(idUtilisateur, skip, limit) {
     try {
-      const voitures = await Voiture.find();
-      return voitures;
+        const voitures = await Voiture.find({ idUtilisateur }).skip(skip).limit(limit).populate('idUtilisateur');
+        return voitures;
+    } catch (error) {
+        throw error;
+    }
+  }
+
+  async countVoiture() {
+    try {
+      return await Voiture.countDocuments();
     } catch (error) {
       throw error;
     }
   }
-  async getByIdUtilisateur(idUtilisateur) {
-    try {
-      const voitures = await Voiture.find({ idUtilisateur }).populate(
-        "idUtilisateur"
-      );
-      return voitures;
-    } catch (error) {
-      throw error;
-    }
-  }
-  async getVoiture(query) {
-    try {
-      const voitures = await Voiture.find({
-        immatriculation: { $regex: query, $options: "i" },
-      });
-      return voitures;
-    } catch (error) {
-      throw error;
-    }
-  }
+  
 }
 
 module.exports = VoitureService;

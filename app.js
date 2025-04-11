@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");  // Importer le package cors
 const app = express();
 const port = process.env.PORT || 5000;
 const mongo = require("./config/dbMongo");
@@ -9,6 +10,20 @@ const ProposController = require("./controller/ProposController");
 const PrestationController = require("./controller/PrestationController");
 const PromotionController = require("./controller/PromotionController");
 const TacheController = require("./controller/TacheController");
+const RendezVousController = require("./controller/RendezVousController");
+const validatePrestation = require('./middleware/validatePrestation');
+const validatePropos = require('./middleware/validatePropos');
+
+const corsOptions = {
+  origin: 'http://localhost:4200',  
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Méthodes autorisées
+  allowedHeaders: ['Content-Type', 'x-access-token'],  // En-têtes autorisés
+  preflightContinue: false,  // CORS: gérer les requêtes OPTIONS
+  optionsSuccessStatus: 200  // Statut de succès pour les prérequis OPTIONS
+};
+
+// Utiliser le middleware CORS dans ton app
+app.use(cors(corsOptions));  // Appliquer CORS à toutes les requêtes
 
 mongo();
 
@@ -28,15 +43,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Utilisation du Router Express
 const router = express.Router();
 const userController = new UtilisateurController();
 const piece = new PieceController();
-const voitureController = new VoitureController();
-const proposController = new ProposController();
-const prestationController = new PrestationController();
-const promotionController = new PromotionController();
+const voiture = new VoitureController();
+const propos = new ProposController();
+const prestation = new PrestationController();
+const promotion = new PromotionController();
 const tache = new TacheController();
+const rendezvous = new RendezVousController();
 
 router.post("/user/create", userController.create_user);
 router.get("/user/findAll", userController.findAll);
@@ -45,25 +60,41 @@ router.put("/user/validation", userController.valid);
 
 router.post("/piece/create", piece.create_piece);
 router.get("/piece/", piece.findAll);
-router.get("/piece/findAll", piece.getAll);
 router.put("/piece/update", piece.update);
-router.post("/piece/delete", piece.delete);
+router.delete("/piece/delete", piece.delete);
 
-router.post("/voiture/create", voitureController.createVoiture);
-router.get(
-  "/voiture/getByUser/:idUtilisateur",
-  voitureController.getVoituresByUtilisateur
-);
+router.post("/voiture/create", voiture.createVoiture);
+router.get("/voiture/getByUser/:idUtilisateur", voiture.getVoituresByUtilisateur);
+router.get("/voiture/findAll", voiture.findAll);
 
-router.post("/propos/create", proposController.createPropos);
-router.get("/propos/findAll", proposController.findAll);
+router.post("/propos/validate", validatePropos, (req, res) => {
+  res.status(200).json({ success: true, message: "Données valides." });
+});
+  
+router.post("/propos/create", propos.createPropos);
+router.get("/propos/findAll", propos.findAll);
+router.put("/propos/update", propos.update);
+router.delete("/propos/delete/:id", propos.delete);
+router.get("/propos/getAll", propos.getAll);
 
-router.post("/prestation/create", prestationController.createPrestation);
-router.get("/prestation/findAll", prestationController.findAll);
-router.put("/prestation/update", prestationController.updatePrix);
+router.post("/prestation/validate", validatePrestation, (req, res) => {
+  res.status(200).json({ success: true, message: "Données valides." });
+});
+  
 
-router.post("/promotion/create", promotionController.createPromotion);
-router.get("/promotion/findAll", promotionController.findAll);
+router.post("/prestation/create", prestation.createPrestation);
+router.get("/prestation/findAll", prestation.findAll);
+router.get("/prestation/getAll", prestation.getAll);
+router.put("/prestation/update", prestation.update);
+router.delete("/prestation/delete", prestation.delete);
+
+router.post("/promotion/create", promotion.createPromotion);
+router.get("/promotion/findAll", promotion.findAll);
+
+router.post("/rendezvous/add", rendezvous.addRendezVous);
+router.get("/rendezvous/findAll", rendezvous.findAll);
+router.put("/rendezvous/validate", rendezvous.validate);
+router.put("/rendezvous/update", rendezvous.update);
 
 router.post("/tache", tache.create);
 router.post("/tache/addDetailsRep", tache.addReparation);
@@ -73,22 +104,7 @@ router.get("/tache/findByDate", tache.findByDates);
 router.get("/tache/findByMec", tache.findByMecanicien);
 router.put("/tache/update", tache.update);
 router.post("/tache/delete", tache.delete_tache);
-router.get("/tache/findAll", tache.getAll);
-router.get("/tache/findAllEnAttente", tache.getAllEnAttente);
-router.put("/tache/update_date", tache.update_date);
-router.get("/tache/fin", tache.getAllFin);
-router.get("/tache/en_cours", tache.getAllEnCours);
-router.get("/tache/filtre_attente", tache.getTacheEnAttenteFiltre);
-router.get("/tache/filtre_encours", tache.getAllEnCoursFiltre);
-router.get("/tache/filtre_fin", tache.getAllFinFiltre);
 
-router.get("/voiture/recherche/:query", voitureController.getVoiture);
-router.get(
-  "/user/mecanicien_recherche/:query",
-  userController.getMecanicienController
-);
-router.get("/prestation/recherche/:query", prestationController.getPrestation);
-router.get("/tache/getById/:id", tache.getTacheById);
 app.use(router);
 
 app.listen(port, () => {
