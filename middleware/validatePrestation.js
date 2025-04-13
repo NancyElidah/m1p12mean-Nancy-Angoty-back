@@ -2,7 +2,7 @@ module.exports = (req, res, next) => {
     const { intitule, prix, prestationType } = req.body;
   
     if (!intitule || intitule.trim() === '') {
-      return res.status(400).json({ error: "L'intitulé est requis." });
+      return res.status(400).json({ error: "Veuillez renseigner l'intitulé de la prestation." });
     }
   
     if (!prix || isNaN(prix)) {

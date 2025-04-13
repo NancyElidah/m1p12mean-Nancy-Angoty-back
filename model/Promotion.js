@@ -7,6 +7,7 @@ const PromotionSchema = new mongoose.Schema(
     fin: { type: Date, required: true },
     pourcentage: { type: Number, required: true }, 
     idPrestation: { type: mongoose.Schema.Types.ObjectId, required: true, ref:"Prestation" },
+    statut: {type:Number, required:true}
   },
   { timestamps: true }
 );

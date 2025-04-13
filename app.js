@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require("cors");  // Importer le package cors
+const cors = require("cors");  
 const app = express();
 const port = process.env.PORT || 5000;
 const mongo = require("./config/dbMongo");
@@ -13,17 +13,18 @@ const TacheController = require("./controller/TacheController");
 const RendezVousController = require("./controller/RendezVousController");
 const validatePrestation = require('./middleware/validatePrestation');
 const validatePropos = require('./middleware/validatePropos');
+const validatePromotion = require('./middleware/validatePromotion');
 
 const corsOptions = {
   origin: 'http://localhost:4200',  
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Méthodes autorisées
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],  // Méthodes autorisées
   allowedHeaders: ['Content-Type', 'x-access-token'],  // En-têtes autorisés
   preflightContinue: false,  // CORS: gérer les requêtes OPTIONS
   optionsSuccessStatus: 200  // Statut de succès pour les prérequis OPTIONS
 };
 
-// Utiliser le middleware CORS dans ton app
-app.use(cors(corsOptions));  // Appliquer CORS à toutes les requêtes
+// Utilisation de CORS dans l'app
+app.use(cors(corsOptions));  // Application de CORS à  toutes les requêtes
 
 mongo();
 
@@ -67,29 +68,25 @@ router.post("/voiture/create", voiture.createVoiture);
 router.get("/voiture/getByUser/:idUtilisateur", voiture.getVoituresByUtilisateur);
 router.get("/voiture/findAll", voiture.findAll);
 
-router.post("/propos/validate", validatePropos, (req, res) => {
-  res.status(200).json({ success: true, message: "Données valides." });
-});
-  
+router.post("/propos/validate", validatePropos, (req, res) => {res.status(200).json({ success: true, message: "Données valides." });});
 router.post("/propos/create", propos.createPropos);
 router.get("/propos/findAll", propos.findAll);
 router.put("/propos/update", propos.update);
 router.delete("/propos/delete/:id", propos.delete);
 router.get("/propos/getAll", propos.getAll);
 
-router.post("/prestation/validate", validatePrestation, (req, res) => {
-  res.status(200).json({ success: true, message: "Données valides." });
-});
-  
-
+router.post("/prestation/validate", validatePrestation, (req, res) => {res.status(200).json({ success: true, message: "Données valides." });});
 router.post("/prestation/create", prestation.createPrestation);
 router.get("/prestation/findAll", prestation.findAll);
 router.get("/prestation/getAll", prestation.getAll);
 router.put("/prestation/update", prestation.update);
 router.delete("/prestation/delete", prestation.delete);
 
+router.post("/promotion/validate", validatePromotion, (req, res) => {res.status(200).json({ success: true, message: "Données valides." });});
 router.post("/promotion/create", promotion.createPromotion);
 router.get("/promotion/findAll", promotion.findAll);
+router.patch("/promotion/validate", promotion.validate);
+router.delete("/promotion/delete", promotion.retirer);
 
 router.post("/rendezvous/add", rendezvous.addRendezVous);
 router.get("/rendezvous/findAll", rendezvous.findAll);
